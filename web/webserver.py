@@ -8,7 +8,7 @@ app.config.from_object(__name__)
 
 @app.route('/')
 def input_form():
-    return render_template("input_text.html")
+    return render_template("index.html")
 
 # @app.route('/', methods=['POST'])
 # def my_form_post():
