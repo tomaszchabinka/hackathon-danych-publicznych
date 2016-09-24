@@ -1,0 +1,48 @@
+body {
+  margin: 0 auto;
+  max-width: 60em;
+  background-color: #E9E9E9;
+}
+
+h1 {
+  color: #3F3F3F;
+  font-size: 20px;
+  font-family: "Lato", sans-serif;
+}
+
+a {
+  color: #7d596a;
+  text-decoration: none;
+}
+
+h5 {
+  color: #3F3F3F;
+  font-size: 15px;
+  font-family: "Lato Light", sans-serif;
+}
+
+#tekstowe {
+  height:300px;
+  width:100%;
+}
+
+/*input[type="submit"] {
+  font-family: "Lato Bold";
+  background-color: #E9E9E9;
+  color: #3F3F3F;
+  border-radius: 3px;
+}
+
+input[type=file] {
+  font-family: "Lato Bold";
+  background-color: #E9E9E9;
+  color: #3F3F3F;
+  border-radius: 3px;
+}
+
+input[name="photo"] {
+  font-family: "Lato Bold";
+  background-color: #E9E9E9;
+  color: #3F3F3F;
+  border-radius: 3px;
+}*/
