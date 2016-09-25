@@ -35,8 +35,65 @@
         {% endif %}
 
         <!--Wynik dla przypadku, gdy wyrażenia w dokumencie są podobne do tych ze str. UOKIK -->
-        {% if false %}
+        {% if result.zuza_clauses|length > 0 %}
             <h2>Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia będące potencjalnie klauzalami zabronionymi.</h2>
+            <table>
+                {% for zuza_clause in result.zuza_clauses %}
+                    <tr>
+                        <th colspan="2"> {{ zuza_clause[0] }} </th>
+                    </tr>
+                    <tr>
+                        <td> Fragment w Twojej umowie: </td><td> {{ zuza_clause[0] }} </td>
+                    </tr>
+                    <tr>
+                        <td> Opis problemu: </td>
+                        <td> 
+                        {% if zuza_clause[1] == "sad_wlasciwy" %}
+                            <ul>
+                            <li>Co do zasady w przypadku sporów sądowych, które zaistnieją na tle umowy, sądem który rozpatruje sprawę, jest sąd w miejscu zamieszkania lub siedziby tej strony umowy, przeciwko której wytaczana jest sprawa.</li>
+                            <li>Jednak w przypadku konfliktu między konsumentem a przedsiębiorcą <b>konsument powinien mieć możliwość wyboru sądu dogodniejszego</b>.</li>
+                            <li>Narzucanie konsumentom sądu, np. w regulaminie, może stanowić <b>duże utrudnienie dochodzenia roszczeń</b> i jest w związku z tym często sprzeczne z interesami konsumentów</li>
+                            </ul>
+                        {% elif zuza_clause[1] == "zmiana_regulaminu" %}
+                            <ul>
+                            <li>Firma, np. sklep internetowy, powinna mieć możliwość zmiany regulaminu świadczonych usług.</li>
+                            <li>W regulaminie <b>musi jednak określić z jakich konkretnie powodów zastrzega dla siebie taką możliwość oraz <b>zagwarantować klientowi możliwość rezygnacji z umowy</b> kiedy regulamin ma ulec zmianie.</li>
+                            </ul>
+                        {% endif %}
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> Klauzula zabroniona: </td>
+                        <td>
+                        {% if zuza_clause[1] == "sad_wlasciwy" %}
+                            <ul>
+                            <li><b>Klauzula:</b> Sądem właściwym dla rozpatrywania wszelkich sporów jest sąd właściwy dla siedziby Sklepu</li>
+                            <li><b>Numer wpisu:</b> 1813</li>
+                            <li><b>Data wydania wyroku:</b> 15.10.2009</li>
+                            <li><b>Sygnatura akt:</b> Sygn. akt XVII AmC 720/09 </li>
+                            <li><b>Nazwa i siedziba sądu, który wydał wyrok:</b> Sąd Okręgowy w Warszawie – Sąd Ochrony Konkurencji i Konsumentów</li>
+                            <li><b>Data dokonania wpisu:</b> 23.12.2009</li>
+                            </ul>
+                        {% elif zuza_clause[1] == "zmiana_regulaminu" %}
+                            <ul>
+                            <li><b>Klauzula:</b> Każda zmiana Regulaminu wchodzi w życie od dnia udostępnienia ujednoliconego tekstu na stronie www.merlin.pl</li>
+                            <li><b>Numer wpisu:</b> 2420</li>
+                            <li><b>Data wydania wyroku:</b> 23.10.2009</li>
+                            <li><b>Sygnatura akt:</b> Sygn. Akt XVII AmC 566/09</li>
+                            <li><b>Nazwa i siedziba sądu, który wydał wyrok:</b> Sąd Okręgowy w Warszawie – Sąd Ochrony Konkurencji i Konsumentów</li>
+                            <li><b>Data dokonania wpisu:</b> 5.07.2011</li>
+                            </ul>
+                        {% endif %}
+                            
+
+
+
+                        </td>
+                    </tr>
+
+                {% endfor %}
+            </table>
         {% endif %}
 
         <!--Wynik dla przypadku, gdy wyrażenie w dokumencie może mieć charakter klauzuli zabronionej-->

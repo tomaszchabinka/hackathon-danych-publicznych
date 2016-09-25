@@ -57,8 +57,6 @@ def rawtext():
 
     check_result = check_agreement(agreement.split("\n"))
 
-    print(check_result.regex_clauses)
-
     return render_template("result_page.html", result=check_result)
 
 @app.route('/agreementurl', methods=['POST'])
@@ -66,14 +64,12 @@ def agreementurl():
 
     url = "http://boilerpipe-web.appspot.com/extract?url=" + request.form['agreement_url'] + "&extractor=ArticleExtractor&output=text&extractImages=&token="
 
-    print(url)
     r = requests.get(url)
 
     if r.status_code == 200:
         agreement = r.text
         check_result = check_agreement(agreement.split("\n"))
-        print(agreement.split("\n")[:10])
-        return check_result
+        return render_template("result_page.html", result=check_result)
     else:
         return "Check your url"
 
@@ -87,11 +83,11 @@ def upload_image():
         print('No selected file')
         return redirect(request.url)
     if file and allowed_file(file.filename, ALLOWED_IMAGE_EXTENSIONS):
-#        with PyTessBaseAPI(lang='pol') as api:
-#            image = Image.open(file)
-#            api.SetImage(image)
-#            check_result = check_agreement(str(api.GetUTF8Text().replace("\n", " ").split(".")) )
-            return "OK"  # check_result
+        with PyTessBaseAPI(lang='pol') as api:
+            image = Image.open(file)
+            api.SetImage(image)
+            check_result = check_agreement(str(api.GetUTF8Text().replace("\n", " ").split(".")) )
+            return render_template("result_page.html", result=check_result)
 
 @app.route('/upload_pdf', methods=['POST'])
 def upload_pdf():
@@ -108,7 +104,7 @@ def upload_pdf():
         os.system("pdftotext uploads/" + filename + " uploads/" + filename + ".txt -nopgbrk")
         with open("uploads/" + filename + ".txt") as file:
             check_result = check_agreement(str("".join(file.readlines()).replace("\n", " ").split(".")))
-            return check_result
+            return render_template("result_page.html", result=check_result)
 
 @app.route('/result')
 def result_page():
@@ -122,29 +118,31 @@ def allowed_file(filename, extensions):
 def check_agreement(agreement):
     regex_clauses = set()
     similar_clauses = []
+    zuza_clauses = []
     knf = []
 
-    predictor = Predictor("train_set.txt.model")
+    main_predictor = Predictor("train_set.txt.model")
+    zuza_predictor = Predictor("zuza_train_set.txt.model")
     for line in agreement:
-        knf_result = knf_match(line)
-        if knf_result != None:
-            knf.append( (line, knf_result[0], knf_result[1]) )
+        if len(line.rstrip()) > 10:
+            knf_result = knf_match(line)
+            if knf_result != None:
+                knf.append( (line, knf_result[0], knf_result[1]) )
 
-        regex_result = regex_match(line)
-        if regex_result != None:
-            regex_clauses.add( (line, regex_result[0], regex_result[1]) )
+            regex_result = regex_match(line)
+            if regex_result != None:
+                regex_clauses.add( (line, regex_result[0], regex_result[1]) )
 
-        label = predictor.predict(line)
-        print(label)
-        if label == 'incorrect':
-            similar_clauses.append( (line, sentences_similarities.find_similar(line)) )
+            label = main_predictor.predict(line)
+            if label == 'incorrect':
+                similar_clauses.append( (line, sentences_similarities.find_similar(line)) )
 
-    result = Result(regex_clauses, similar_clauses, knf)
+            zuza_label = zuza_predictor.predict(line)
+#            print("zuza_label" + zuza_label)
+            if zuza_label != 'correct':
+                zuza_clauses.append( (line, zuza_label) )
 
-    print("result.regex_clauses: " + str(result.regex_clauses))
-    print("result.similar_clauses: " + str(result.similar_clauses))
-
-    print(result.status())
+    result = Result(regex_clauses, similar_clauses, zuza_clauses, knf)
 
     return result
 
@@ -167,13 +165,14 @@ def knf_match(textline):
         return None
 
 class Result:
-    def __init__(self, regex_clauses, similar_clauses, knf_data):
+    def __init__(self, regex_clauses, similar_clauses, zuza_clauses, knf_data):
         self.regex_clauses = regex_clauses
         self.similar_clauses = similar_clauses
+        self.zuza_clauses = zuza_clauses
         self.knf_data = knf_data
 
     def status(self):
-        if len(self.regex_clauses) == 0 and len(self.similar_clauses) == 0 and len(self.knf_data) == 0:
+        if len(self.regex_clauses) == 0 and len(self.similar_clauses) == 0 and len(self.zuza_clauses) == 0 and len(self.knf_data) == 0:
             return "OK"
         else:
             return "FORBIDDEN"
@@ -220,9 +219,9 @@ class Similarities(object):
 
         sims = self.index[vec_lsi]
 
-        print(text.lower().split())
-        print(vec_bow)
-        print(sorted(enumerate(sims), key=lambda item: -item[1])[:5])
+#        print(text.lower().split())
+#        print(vec_bow)
+#        print(sorted(enumerate(sims), key=lambda item: -item[1])[:5])
         sims = list(map(lambda pair: self.documents[pair[0]] , sorted(enumerate(sims), key=lambda item: -item[1]) ))
 
         return sims[:5]
