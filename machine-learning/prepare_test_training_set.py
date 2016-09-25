@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-"""A simple python script template.
-"""
 
 import random
 
