@@ -122,9 +122,14 @@ def allowed_file(filename, extensions):
 def check_agreement(agreement):
     regex_clauses = set()
     similar_clauses = []
+    knf = []
 
     predictor = Predictor("train_set.txt.model")
     for line in agreement:
+        knf_result = knf_match(line)
+        if knf_result != None:
+            knf.append( (line, knf_result[0], knf_result[1]) )
+
         regex_result = regex_match(line)
         if regex_result != None:
             regex_clauses.add( (line, regex_result[0], regex_result[1]) )
@@ -134,7 +139,7 @@ def check_agreement(agreement):
         if label == 'incorrect':
             similar_clauses.append( (line, sentences_similarities.find_similar(line)) )
 
-    result = Result(regex_clauses, similar_clauses)
+    result = Result(regex_clauses, similar_clauses, knf)
 
     print("result.regex_clauses: " + str(result.regex_clauses))
     print("result.similar_clauses: " + str(result.similar_clauses))
@@ -151,14 +156,24 @@ def regex_match(textline):
                 return (i[0], i[2])
         return None
 
+def knf_match(textline):
+    with open('data/daneknf.csv') as csvfile:
+        knf_data = csv.reader(csvfile, strict=True)
+        for data in knf_data:
+            name = data[0]
+            id_number = data[1] 
+            if name in textline or id_number in textline:
+                return (name, id_number)
+        return None
+
 class Result:
-    def __init__(self, regex_clauses, similar_clauses):
+    def __init__(self, regex_clauses, similar_clauses, knf_data):
         self.regex_clauses = regex_clauses
         self.similar_clauses = similar_clauses
+        self.knf_data = knf_data
 
     def status(self):
-        print("status")
-        if len(self.regex_clauses) == 0 and len(self.similar_clauses) == 0:
+        if len(self.regex_clauses) == 0 and len(self.similar_clauses) == 0 and len(self.knf_data) == 0:
             return "OK"
         else:
             return "FORBIDDEN"

@@ -69,10 +69,17 @@
         {% endif %}
 
         <!--Wynik dla przypadku, gdy podmiot jest na liście ostrzeżeń KNF-->
-        {% if false %}
+        {% if result.knf_data|length > 0 %}
             <h2>Podmiot, z którymi chcesz zawrzeć umowę widnieje na liście ostrzeżeń <a href="https://www.uokik.gov.pl/" target="_blank">Komisji Nadzoru Finansowego</a></h2>.
             <table>
-                <tr><td></td></tr>
+                <tr>
+                    <th>Nazwa podmiotu</th><th>Numer identyfikacyjny</th><th>Fragment umowy</th>
+                </tr>
+                {% for knf_data in result.knf_data %}
+                <tr>
+                    <td>{{knf_data[1]}}</td><td>{{knf_data[2]}}</td><td>{{knf_data[0]}}</td>
+                </tr>
+                {% endfor %}
             </table>
         {% endif %}
 
