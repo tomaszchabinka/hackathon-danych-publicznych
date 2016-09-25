@@ -11,7 +11,7 @@
     <!--Wynik dla przypadku, który jest w porządku-->
     {% if result.status() == "OK" %}
     <h1>Wygląda na to, że Twój dokument jest w porządku.</h1>
-    <p>Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.<p>
+    <p>Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.</p>
     <p>Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów </a> i zapoznaj się z wybranymi klauzalami zabronionymi.</p>
     <p>To uchroni Cię przed ryzykiem w przyszłości.</a></p>
 
@@ -23,7 +23,9 @@
         {% if result.regex_clauses|length > 0 %}
             <h2>Twój dokument zawiera zabronioną klauzulę, przed którą ostrzega na swojej stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urząd Ochrony Konkurencji i Konsumentów</a>.</h2>
             <table>
-                <th>Klauzula zabroniona</th><th>Fragment w Twojej umowie</th>
+                <tr>
+                    <th>Klauzula zabroniona</th><th>Fragment w Twojej umowie</th>
+                </tr>
                 {% for regex_clause in result.regex_clauses %}
                 <tr>
                     <td>{{ regex_clause[2] }}</td><td>{{ regex_clause[0] }}</td>
@@ -83,10 +85,10 @@
 
     <p>Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.</p>
     <p>Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a> i zapoznaj się z wybranymi klauzalami zabronionymi</a>.</p>
-    </p>To uchroni Cię przed ryzykiem w przyszłości.</p>
+    <p>To uchroni Cię przed ryzykiem w przyszłości.</p>
 
     {% endif %}
 
-    <h5>Powrót do <a href="/">strony głównej.</h5>
+    <h5>Powrót do <a href="/">strony głównej.</a></h5>
 </body>
 </html>
