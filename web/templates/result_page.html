@@ -21,8 +21,7 @@
     <h1>Mamy problem!</h1>
 
         {% if result.regex_clauses|length > 0 %}
-            <h2>Twój dokument zawiera zabronioną klauzulę,
-            przed którą ostrzega na swojej stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urząd Ochrony Konkurencji i Konsumentów</a>.</h2>
+            <h2>Twój dokument zawiera zabronioną klauzulę, przed którą ostrzega na swojej stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urząd Ochrony Konkurencji i Konsumentów</a>.</h2>
             <table>
                 <th>Klauzula zabroniona</th><th>Fragment w Twojej umowie</th>
                 {% for regex_clause in result.regex_clauses %}
@@ -35,14 +34,13 @@
 
         <!--Wynik dla przypadku, gdy wyrażenia w dokumencie są podobne do tych ze str. UOKIK -->
         {% if false %}
-            <h2>Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia podobne do klauzul zabronionych, które widnieją
-            na stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a></h2>.
+            <h2>Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia będące potencjalnie klauzalami zabronionymi.</h2>
         {% endif %}
 
         <!--Wynik dla przypadku, gdy wyrażenie w dokumencie może mieć charakter klauzuli zabronionej-->
         {% if result.similar_clauses|length > 0 %}
-            <h2>Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia będące potencjalnie klauzalami zabronionymi.</h2>
-
+            <h2>Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia podobne do klauzul zabronionych, które widnieją na stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a></h2>.
+            
             <table>
                 {% for similar_clause in result.similar_clauses %}
                     <tr>

@@ -144,7 +144,7 @@ def check_agreement(agreement):
     print("result.regex_clauses: " + str(result.regex_clauses))
     print("result.similar_clauses: " + str(result.similar_clauses))
 
-    print(result.status)
+    print(result.status())
 
     return result
 
@@ -162,7 +162,7 @@ def knf_match(textline):
         for data in knf_data:
             name = data[0]
             id_number = data[1] 
-            if name in textline or id_number in textline:
+            if name in textline or (len(id_number) > 0 and id_number in textline):
                 return (name, id_number)
         return None
 
@@ -219,7 +219,12 @@ class Similarities(object):
         vec_lsi = self.lsi[vec_bow]
 
         sims = self.index[vec_lsi]
+
+        print(text.lower().split())
+        print(vec_bow)
+        print(sorted(enumerate(sims), key=lambda item: -item[1])[:5])
         sims = list(map(lambda pair: self.documents[pair[0]] , sorted(enumerate(sims), key=lambda item: -item[1]) ))
+
         return sims[:5]
 
 
