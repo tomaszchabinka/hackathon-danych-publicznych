@@ -57,7 +57,9 @@ def rawtext():
 
     check_result = check_agreement(agreement.split("\n"))
 
-    return check_result
+    print(check_result.regex_clauses)
+
+    return render_template("result_page.html", result=check_result)
 
 @app.route('/agreementurl', methods=['POST'])
 def agreementurl():
@@ -128,23 +130,24 @@ def check_agreement(agreement):
             regex_clauses.add( (line, regex_result[0], regex_result[1]) )
 
         label = predictor.predict(line)
+        print(label)
         if label == 'incorrect':
             similar_clauses.append( (line, sentences_similarities.find_similar(line)) )
 
     result = Result(regex_clauses, similar_clauses)
 
-    print(result.regex_clauses)
-    print(result.similar_clauses)
+    print("result.regex_clauses: " + str(result.regex_clauses))
+    print("result.similar_clauses: " + str(result.similar_clauses))
 
-    return str(result)
+    print(result.status)
+
+    return result
 
 def regex_match(textline):
     with open('data/new_100.csv') as csvfile:
         regexdata = csv.reader(csvfile, strict=True)
         for i in regexdata:
-            #print("i[3]: "+i[3]+"\n")
-            #print("textline: "+textline+"\n")
-            if re.match(i[3][1:-1], textline) is not None:
+            if re.match(".*"+i[3][1:-1]+".*", textline) is not None:
                 return (i[0], i[2])
         return None
 
@@ -154,6 +157,7 @@ class Result:
         self.similar_clauses = similar_clauses
 
     def status(self):
+        print("status")
         if len(self.regex_clauses) == 0 and len(self.similar_clauses) == 0:
             return "OK"
         else:

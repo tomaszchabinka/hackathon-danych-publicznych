@@ -9,48 +9,78 @@
 
 <body class="body">
     <!--Wynik dla przypadku, który jest w porządku-->
-    <h1>Wygląda na to, że Twój dokument jest w porządku.
-    <br>
-    Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.
-    Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów </a> i zapoznaj się z wybranymi klauzalami zabronionymi.
-    To uchroni Cię przed ryzykiem w przyszłości.</a></h1>
+    {% if result.status() == "OK" %}
+    <h1>Wygląda na to, że Twój dokument jest w porządku.</h1>
+    <p>Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.<p>
+    <p>Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów </a> i zapoznaj się z wybranymi klauzalami zabronionymi.</p>
+    <p>To uchroni Cię przed ryzykiem w przyszłości.</a></p>
 
     <!--Wynik dla przypadku, gdy dokument zawiera zabronioną klauzulę-->
-    <h1>Mamy problem! Twój dokument zawiera zabronioną klauzulę,
-    przed którą ostrzega na swojej stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urząd Ochrony Konkurencji i Konsumentów</a>.
-    <br>
-    Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.
-    Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a> i zapoznaj się z wybranymi klauzalami zabronionymi.
-    To uchroni Cię przed ryzykiem w przyszłości.</a></h1>
-    <table>
-        <tr><td></td></tr>
-    </table>
+    {% else %}
 
-    <!--Wynik dla przypadku, gdy wyrażenia w dokumencie są podobne do tych ze str. UOKIK -->
-    <h1>Mamy problem! Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia podobne do klauzul zabronionych, które widnieją
-    na stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a>.
-    <br>
-    Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.
-    Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a> i zapoznaj się z wybranymi klauzalami zabronionymi.
-    To uchroni Cię przed ryzykiem w przyszłości.</a></h1>
+    <h1>Mamy problem!</h1>
 
-    <!--Wynik dla przypadku, gdy wyrażenie w dokumencie może mieć charakter klauzuli zabronionej-->
-    <h1>Mamy problem! Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia będące potencjalnie klauzalami zabronionymi.
-    <br>
-    Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.
-    Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a> i zapoznaj się z wybranymi klauzalami zabronionymi.
-    To uchroni Cię przed ryzykiem teraz i w przyszłości.</a></h1>
+        {% if result.regex_clauses|length > 0 %}
+            <h2>Twój dokument zawiera zabronioną klauzulę,
+            przed którą ostrzega na swojej stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urząd Ochrony Konkurencji i Konsumentów</a>.</h2>
+            <table>
+                <th>Klauzula zabroniona</th><th>Fragment w Twojej umowie</th>
+                {% for regex_clause in result.regex_clauses %}
+                <tr>
+                    <td>{{ regex_clause[2] }}</td><td>{{ regex_clause[0] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
 
-    <!--Wynik dla przypadku, gdy podmiot jest na liście ostrzeżeń KNF-->
-    <h1>Mamy problem! Podmiot, z którymi chcesz zawrzeć umowę widnieje na liście ostrzeżeń
-    <a href="https://www.uokik.gov.pl/" target="_blank">Komisji Nadzoru Finansowego</a>.
-    <br>
-    Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.
-    Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a> i zapoznaj się z wybranymi klauzalami zabronionymi.
-    To uchroni Cię przed ryzykiem w przyszłości.</a></h1>
-    <table>
-        <tr><td></td></tr>
-    </table>
+        <!--Wynik dla przypadku, gdy wyrażenia w dokumencie są podobne do tych ze str. UOKIK -->
+        {% if false %}
+            <h2>Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia podobne do klauzul zabronionych, które widnieją
+            na stronie <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a></h2>.
+        {% endif %}
+
+        <!--Wynik dla przypadku, gdy wyrażenie w dokumencie może mieć charakter klauzuli zabronionej-->
+        {% if result.similar_clauses|length > 0 %}
+            <h2>Wygląda na to, że Twój dokument zawiera wyrażenie lub wyrażenia będące potencjalnie klauzalami zabronionymi.</h2>
+
+            <table>
+                {% for similar_clause in result.similar_clauses %}
+                    <tr>
+                        <th>Fragment umowy: </th><th>{{ similar_clause[0] }}</th>
+                    </tr>
+                    <tr>
+                        <td>Podobna klauzula #1</td><td>{{ similar_clause[1][0] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Podobna klauzula #2</td><td>{{ similar_clause[1][1] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Podobna klauzula #3</td><td>{{ similar_clause[1][2] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Podobna klauzula #4</td><td>{{ similar_clause[1][3] }}</td>
+                    </tr>
+                    <tr>
+                        <td>Podobna klauzula #5</td><td>{{ similar_clause[1][4] }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+        {% endif %}
+
+        <!--Wynik dla przypadku, gdy podmiot jest na liście ostrzeżeń KNF-->
+        {% if false %}
+            <h2>Podmiot, z którymi chcesz zawrzeć umowę widnieje na liście ostrzeżeń <a href="https://www.uokik.gov.pl/" target="_blank">Komisji Nadzoru Finansowego</a></h2>.
+            <table>
+                <tr><td></td></tr>
+            </table>
+        {% endif %}
+
+    <p>Pamiętaj, aby zawsze uważnie czytać umowy i regulaminy, które podpisujesz.</p>
+    <p>Dla pewności zajrzyj na stronę <a href="https://www.uokik.gov.pl/" target="_blank">Urzędu Ochrony Konkurencji i Konsumentów</a> i zapoznaj się z wybranymi klauzalami zabronionymi</a>.</p>
+    </p>To uchroni Cię przed ryzykiem w przyszłości.</p>
+
+    {% endif %}
 
     <h5>Powrót do <a href="/">strony głównej.</h5>
 </body>
