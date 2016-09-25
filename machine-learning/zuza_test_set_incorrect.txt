@@ -1,0 +1,4 @@
+sad_wlasciwy	Sądem właściwym dla rozpatrywania sporów wynikających z umowy sprzedaży jest sąd właściwy dla siedziby pozwanego
+sad_wlasciwy	Sądem właściwym do rozstrzygania sporów jest sąd w Gliwicach
+zmiana_regulaminu	Wysokość opłaty za usługę może ulec zmianie. Zmiana wysokości opłaty za usługę nie stanowi zmiany Regulaminu
+zmiana_regulaminu	Zmienione zapisy Regulaminu są wiążące od momentu ich opublikowania w witrynie sklepu.

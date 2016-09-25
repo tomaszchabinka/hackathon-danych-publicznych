@@ -124,6 +124,7 @@ def check_agreement(agreement):
     main_predictor = Predictor("train_set.txt.model")
     zuza_predictor = Predictor("zuza_train_set.txt.model")
     for line in agreement:
+        print(line + ":  "+str(len(line.rstrip())))
         if len(line.rstrip()) > 10:
             knf_result = knf_match(line)
             if knf_result != None:
@@ -138,7 +139,7 @@ def check_agreement(agreement):
                 similar_clauses.append( (line, sentences_similarities.find_similar(line)) )
 
             zuza_label = zuza_predictor.predict(line)
-#            print("zuza_label" + zuza_label)
+            print("zuza_label" + zuza_label)
             if zuza_label != 'correct':
                 zuza_clauses.append( (line, zuza_label) )
 
@@ -160,7 +161,7 @@ def knf_match(textline):
         for data in knf_data:
             name = data[0]
             id_number = data[1] 
-            if name in textline or (len(id_number) > 0 and id_number in textline):
+            if name.rstrip() in textline or (len(id_number.rstrip()) > 0 and id_number.rstrip() in textline):
                 return (name, id_number)
         return None
 
