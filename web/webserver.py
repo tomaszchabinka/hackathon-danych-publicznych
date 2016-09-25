@@ -1,12 +1,11 @@
 from flask import Flask
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
-<<<<<<< HEAD
 from werkzeug.utils import secure_filename
 
-import tesserocr
-from PIL import Image
-from tesserocr import PyTessBaseAPI
+#import tesserocr
+#from PIL import Image
+#from tesserocr import PyTessBaseAPI
 
 ALLOWED_IMAGE_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 ALLOWED_PDF_EXTENSIONS = set(['pdf'])
@@ -81,11 +80,11 @@ def upload_image():
         print('No selected file')
         return redirect(request.url)
     if file and allowed_file(file.filename, ALLOWED_IMAGE_EXTENSIONS):
-        with PyTessBaseAPI(lang='pol') as api:
-            image = Image.open(file)
-            api.SetImage(image)
-            check_result = check_agreement(str(api.GetUTF8Text().replace("\n", " ").split(".")) )
-            return check_result
+#        with PyTessBaseAPI(lang='pol') as api:
+#            image = Image.open(file)
+#            api.SetImage(image)
+#            check_result = check_agreement(str(api.GetUTF8Text().replace("\n", " ").split(".")) )
+            return "OK"  # check_result
 
 @app.route('/upload_pdf', methods=['POST'])
 def upload_pdf():
@@ -99,10 +98,14 @@ def upload_pdf():
     if file and allowed_file(file.filename, ALLOWED_PDF_EXTENSIONS):
         filename = str(uuid.uuid4()) + ".pdf"
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        os.system("pdftotext uploads/" + filename + " uploads/" + filename +".txt -nopgbrk")
-        with open("uploads/" + filename +".txt") as file:
+        os.system("pdftotext uploads/" + filename + " uploads/" + filename + ".txt -nopgbrk")
+        with open("uploads/" + filename + ".txt") as file:
             check_result = check_agreement(str("".join(file.readlines()).replace("\n", " ").split(".")))
             return check_result
+
+@app.route('/result')
+def result_page():
+    return render_template("result_page.html")
 
 
 def allowed_file(filename, extensions):

@@ -4,6 +4,10 @@ body {
   background-color: #E9E9E9;
 }
 
+table {
+  border: 1px solid black;
+}
+
 h1 {
   color: #3F3F3F;
   font-size: 20px;
@@ -21,7 +25,7 @@ h5 {
   font-family: "Lato Light", sans-serif;
 }
 
-#tekstowe {
+#text_field {
   height:300px;
   width:100%;
 }
