@@ -2,6 +2,9 @@ from flask import Flask
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 from werkzeug.utils import secure_filename
+from libshorttext.classifier import *
+from gensim import corpora, models, similarities
+from collections import defaultdict
 
 #import tesserocr
 #from PIL import Image
@@ -16,6 +19,8 @@ PDF_UPLOAD_DICTIONARY = 'uploads/'
 import requests
 import os
 import uuid
+import re
+import csv
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -113,7 +118,93 @@ def allowed_file(filename, extensions):
            filename.rsplit('.', 1)[1] in extensions
 
 def check_agreement(agreement):
-    return "OK!"
+    regex_clauses = set()
+    similar_clauses = []
+
+    predictor = Predictor("train_set.txt.model")
+    for line in agreement:
+        regex_result = regex_match(line)
+        if regex_result != None:
+            regex_clauses.add( (line, regex_result[0], regex_result[1]) )
+
+        label = predictor.predict(line)
+        if label == 'incorrect':
+            similar_clauses.append( (line, sentences_similarities.find_similar(line)) )
+
+    result = Result(regex_clauses, similar_clauses)
+
+    print(result.regex_clauses)
+    print(result.similar_clauses)
+
+    return str(result)
+
+def regex_match(textline):
+    with open('data/new_100.csv') as csvfile:
+        regexdata = csv.reader(csvfile, strict=True)
+        for i in regexdata:
+            #print("i[3]: "+i[3]+"\n")
+            #print("textline: "+textline+"\n")
+            if re.match(i[3][1:-1], textline) is not None:
+                return (i[0], i[2])
+        return None
+
+class Result:
+    def __init__(self, regex_clauses, similar_clauses):
+        self.regex_clauses = regex_clauses
+        self.similar_clauses = similar_clauses
+
+    def status(self):
+        if len(self.regex_clauses) == 0 and len(self.similar_clauses) == 0:
+            return "OK"
+        else:
+            return "FORBIDDEN"
+
+    def __str__(self):
+        return self.status()
+
+class Predictor(object):
+    def __init__(self, model_name):
+        self.model_name = model_name
+        self.text_model = TextModel()
+        self.text_model.load(self.model_name)
+
+    def predict(self, text):
+        return predict_single_text(text, self.text_model).predicted_y
+
+class Similarities(object):
+
+    def __init__(self):
+        with open("data/documents.txt") as klauzule:
+            with open("data/stopwords.txt") as stopwords:
+                self.documents = list(filter(lambda line: len(line) > 0,set(map(lambda line: line.rstrip(), klauzule.readlines()))))
+
+                stoplist = set(map(lambda line: line.rstrip(), stopwords.readlines()))
+                texts = [[word for word in document.lower().split() if word not in stoplist] for document in self.documents]
+
+                frequency = defaultdict(int)
+                for text in texts:
+                    for token in text:
+                        frequency[token] += 1
+
+                texts = [[token for token in text if frequency[token] > 1] for text in texts]
+
+                self.dictionary = corpora.Dictionary(texts)
+
+                corpus = [self.dictionary.doc2bow(text) for text in texts]
+
+                self.lsi = models.LsiModel(corpus, id2word=self.dictionary)
+                self.index = similarities.MatrixSimilarity(self.lsi[corpus])
+
+    def find_similar(self, text):
+        vec_bow = self.dictionary.doc2bow(text.lower().split())
+        vec_lsi = self.lsi[vec_bow]
+
+        sims = self.index[vec_lsi]
+        sims = list(map(lambda pair: self.documents[pair[0]] , sorted(enumerate(sims), key=lambda item: -item[1]) ))
+        return sims[:5]
+
+
+sentences_similarities = Similarities()
 
 if __name__ == "__main__":
     app.secret_key = os.urandom(24)
